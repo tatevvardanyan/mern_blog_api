@@ -114,6 +114,3 @@ router.get("/posts/:id", async (req, res) => {
 })
 
 module.exports = router
-//6pOnZX5ewPrFTysN
-//https://www.youtube.com/watch?v=xKs2IZZya7c
-//2:00:10

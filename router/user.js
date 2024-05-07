@@ -46,7 +46,6 @@ userRouter.post("/post", upload.single('file'), async (req, res) => {
 
 userRouter.put("/post", async (req, res) => {
     const { token } = req.cookies;
-    // console.log(token)
     if (token) {
         jwt.verify(token, secret, {}, async (err, info) => {
             if (err) {

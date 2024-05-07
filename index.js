@@ -19,5 +19,3 @@ app.use("/user", userRouter);
 app.use("/admin", adminRouter)
  
 app.listen(port, () => console.log(`listening  http://localhost:${port}`));
-//
-//
