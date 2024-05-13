@@ -25,7 +25,8 @@ router.post("/register", async (req, res) => {
                 fullName: userDoc.fullName,
                 username: userDoc.username,
                 role: userDoc.role,
-                isAuth: false
+                isAuth: false,
+                v: 0
             })
             res.json({ userDto, mess: "successful" })
         }
@@ -50,17 +51,23 @@ router.post('/login', async (req, res) => {
                     fullName: userDoc.fullName,
                     username: userDoc.username,
                     role: userDoc.role,
-                    isAuth: true
+                    isAuth: true,
+                    v: userDoc.v
                 });
-                jwt.sign({ username, id: userDto.id, role: userDto.role, isAuth: userDto.isAuth }, secret, {}, (err, token) => {
-                    if (err) throw err;
-                    res.cookie('token', token).json({
-                        id: userDto.id,
-                        username,
-                        role: userDto.role,
-                        isAuth: userDto.isAuth
-                    })
-                });
+                if (userDto.v === 1) {
+                    jwt.sign({ username, id: userDto.id, role: userDto.role, isAuth: userDto.isAuth, v: userDto.v }, secret, {}, (err, token) => {
+                        if (err) throw err;
+                        res.cookie('token', token).json({
+                            id: userDto.id,
+                            username,
+                            role: userDto.role,
+                            isAuth: userDto.isAuth,
+                            v: userDto.v
+                        })
+                    });
+                } else {
+                    res.status(400).json({ mess: "you can't login" })//user not find
+                }
             } else {
                 res.status(400).json({ mess: 'wrong credentials' })//password
             }
@@ -83,7 +90,11 @@ router.get("/profile", async (req, res) => {
                 res.status(401).json({ error: "Unauthorized" });
             } else {
                 if (info.isAuth) {
-                    res.json(info)
+                    if (info.v === 1) {
+                        res.json(info)
+                    } else {
+                        res.status(401).json({ error: "Unauthorized" })
+                    }
                 } else {
                     res.status(401).json({ error: "Unauthorized" });
                 }
@@ -100,7 +111,7 @@ router.post("/logout", (req, res) => {
 
 router.get("/posts", async (req, res) => {
     const posts = await Post.find()
-         .populate("author", 'username')
+        .populate("author", 'username')
         .sort({ createdAt: -1 })
         .limit(20);
     res.json(posts)

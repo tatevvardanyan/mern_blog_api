@@ -25,15 +25,19 @@ userRouter.post("/post", upload.single('file'), async (req, res) => {
                 res.status(401).json({ error: "Unauthorized" });
             } else {
                 if (info.isAuth) {
-                    const { title, summery, content } = req.body;
-                    const postDoc = await Post.create({
-                        title,
-                        summery,
-                        content,
-                        cover: req.file.filename,
-                        author: info.id
-                    });
-                    res.json('ok')
+                    if (info.v === 1) {
+                        const { title, summery, content } = req.body;
+                        const postDoc = await Post.create({
+                            title,
+                            summery,
+                            content,
+                            cover: req.file.filename,
+                            author: info.id
+                        });
+                        res.json('ok')
+                    } else {
+                        res.status(401).json({ error: "Unauthorized" });
+                    }
                 } else {
                     res.status(401).json({ error: "Unauthorized" });
                 }
@@ -52,19 +56,23 @@ userRouter.put("/post", async (req, res) => {
                 res.status(401).json({ error: "Unauthorized" });
             } else {
                 if (info.isAuth) {
-                    const { id, title, summery, content } = req.body;
-                    const postIndex = await Post.findById({ _id: id });
-                    const isAuthor = JSON.stringify(postIndex.author) === JSON.stringify(info.id);
-                    if (!isAuthor) {
-                        return res.status(400).json('You are not the author');
+                    if (info.v === 1) {
+                        const { id, title, summery, content } = req.body;
+                        const postIndex = await Post.findById({ _id: id });
+                        const isAuthor = JSON.stringify(postIndex.author) === JSON.stringify(info.id);
+                        if (!isAuthor) {
+                            return res.status(400).json('You are not the author');
+                        }
+                        const update = await Post.findByIdAndUpdate(id, {
+                            title,
+                            summery,
+                            content,
+                            cover: postIndex.cover
+                        })
+                        res.json("ok")
+                    } else {
+                        res.status(401).json({ error: "Unauthorized" });
                     }
-                    const update = await Post.findByIdAndUpdate(id, {
-                        title,
-                        summery,
-                        content,
-                        cover: postIndex.cover
-                    })
-                    res.json(update)
                 } else {
                     res.status(401).json({ error: "Unauthorized" });
                 }

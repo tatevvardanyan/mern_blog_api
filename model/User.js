@@ -21,6 +21,10 @@ const UserSchema = new Schema({
     role: {
         type: Number,
         default: 0
+    },
+    v: {
+        type: Number,
+        default: 0
     }
 });
 
