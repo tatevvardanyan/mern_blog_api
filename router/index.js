@@ -8,7 +8,9 @@ const jwt = require("jsonwebtoken");
 const secret = "tetras-vi-key";
 const UserDto = require("../dto/userDto")
 
-
+router.get("/", (req, res) => {
+    res.json("hello world")
+})
 router.post("/register", async (req, res) => {
     const { username, password, fullName } = req.body;
     try {
